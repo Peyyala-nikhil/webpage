@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Glossary Website</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    .term { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Glossary</h1>
+  <ul id="glossary"></ul>
+  <h2>Add Term</h2>
+  <input id="term" placeholder="Term" /><input id="definition" placeholder="Definition" />
+  <button onclick="addTerm()">Add</button>
+  <script>
+    async function loadGlossary() {
+      let res = await fetch('/api/terms');
+      let data = await res.json();
+      let ul = document.getElementById('glossary');
+      ul.innerHTML = '';
+      data.forEach(item => {
+        let li = document.createElement('li');
+        li.innerHTML = `<span class="term">${item.term}</span>: ${item.definition}`;
+        ul.appendChild(li);
+      });
+    }
+    async function addTerm() {
+      let term = document.getElementById('term').value;
+      let definition = document.getElementById('definition').value;
+      await fetch('/api/terms', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ term, definition })
+      });
+      loadGlossary();
+    }
+    loadGlossary();
+  </script>
+</body>
+</html>
